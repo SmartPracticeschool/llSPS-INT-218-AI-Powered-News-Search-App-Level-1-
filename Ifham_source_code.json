@@ -1,0 +1,346 @@
+[
+    {
+        "id": "b3b77d05.58b16",
+        "type": "tab",
+        "label": "Flow 3",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "e6ed6513.35f3f8",
+        "type": "function",
+        "z": "b3b77d05.58b16",
+        "name": "user_input",
+        "func": "msg={\n    discoveryparams:\n    {\n\"environment_id\":\"system\",\n\"query\":msg.payload.input\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 150,
+        "y": 120,
+        "wires": [
+            [
+                "65e5288f.732bc8"
+            ]
+        ]
+    },
+    {
+        "id": "65e5288f.732bc8",
+        "type": "watson-discovery-v1",
+        "z": "b3b77d05.58b16",
+        "name": "query_processing",
+        "environmentname": "s",
+        "environmentId": "system",
+        "collectionId": "news-en",
+        "configurationname": "",
+        "configurationId": "",
+        "language_code": "en",
+        "collection_name": "",
+        "count": "10",
+        "passages": true,
+        "nlp_query": true,
+        "query": "",
+        "filter": "",
+        "aggregation": "term(enriched_text.sentiment.document.label)",
+        "return": "",
+        "description": "",
+        "size": "LT",
+        "discovery-method": "query",
+        "service-endpoint": "https://api.eu-gb.discovery.watson.cloud.ibm.com/instances/7cec2569-6ea5-48d3-b926-8f081f8a8fa4",
+        "x": 230,
+        "y": 300,
+        "wires": [
+            [
+                "9241fc12.90d9c",
+                "aad13b3.d1965c8"
+            ]
+        ]
+    },
+    {
+        "id": "9241fc12.90d9c",
+        "type": "function",
+        "z": "b3b77d05.58b16",
+        "name": "news_output",
+        "func": "var i;\nvar arr=[];\nfor(i=0;i<10;i++){\n    arr.push({title:msg.search_results.results[i].title,\n        content: msg.search_results.results[i].text,\n        url: msg.search_results.results[i].url,\n        sentiment:msg.search_results.results[i].enriched_text.sentiment.document.label\n    });\n}\nmsg.payload= arr;\nreturn msg;\n\n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 470,
+        "y": 80,
+        "wires": [
+            [
+                "363f0d05.ded592",
+                "aaf12710.386aa8"
+            ]
+        ]
+    },
+    {
+        "id": "981d0002.f2a06",
+        "type": "ui_form",
+        "z": "b3b77d05.58b16",
+        "name": "",
+        "label": "<strong>SEARCH</strong>",
+        "group": "f0a88ceb.00a94",
+        "order": 2,
+        "width": 14,
+        "height": "1",
+        "options": [
+            {
+                "label": "",
+                "value": "input",
+                "type": "text",
+                "required": true,
+                "rows": null
+            }
+        ],
+        "formValue": {
+            "input": ""
+        },
+        "payload": "",
+        "submit": "submit",
+        "cancel": "cancel",
+        "topic": "",
+        "x": 140,
+        "y": 40,
+        "wires": [
+            [
+                "e6ed6513.35f3f8"
+            ]
+        ]
+    },
+    {
+        "id": "363f0d05.ded592",
+        "type": "ui_template",
+        "z": "b3b77d05.58b16",
+        "group": "f0a88ceb.00a94",
+        "name": "main_ui",
+        "order": 1,
+        "width": 14,
+        "height": "7",
+        "format": "<head>\n<style>\n\n\n\n\nbody{position: relative;}\n/* width */\n::-webkit-scrollbar {\n  width: 9px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n  box-shadow: inset 0 0 5px black; \n  border-radius: 7px;\n}\n \n/* Handle */\n::-webkit-scrollbar-thumb {\n  background: #b30000; \n  border-radius: 8px;\n}\n\n/* Handle on hover */\n::-webkit-scrollbar-thumb:hover {\n  background: maroon; \n}\n\n\n/* unvisited link */\na:link {\n  color: red;\n  text-decoration: none;\n}\n\n/* visited link */\na:visited {\n  color: rgb(226,100,0);\n  text-decoration: none;\n}\n\n/* mouse over link */\na:hover {\n  color: maroon;\n  font-size:150%;\n  font-family:verdana;\n  text-decoration: none;\n}\n/* selected link */\na:active {\n  color: orange;\n  <!--color:rgb(180,220,0)-->\n}\n\n</style>\n</head>\n<body>\n<div>\n    <p ng-repeat=\"x in msg.payload\">\n        <i class=\"fa fa-newspaper-o\"></i>\n        <a href=\"{{x['url']}}\" target=\"_blank\">\n           \n            <span style=\"font-weight: bold; font-size:22px\">\n        {{x['title']}}\n            </span>\n        </a>\n    <br>       \n    <span style=\"color:black\">\n        {{x['content']}}\n    </span>\n    <br>\n    \n    <span style=\"font-weight:bold;font-size:18px\">\n        Sentiment\n    </span>\n    <span ng-if=\"x.sentiment=='positive'\">\n    <span style=\"color:rgb(220,25,0)\">\n    <i class=\"fa fa-plus\"></i>\n    \n    </span>\n    </span>\n    \n     <span ng-if=\"x.sentiment=='negative'\">\n    <span style=\"color: black\">\n    <i class=\"fa fa-minus\"></i>\n    </span>\n    </span>\n    \n     <span ng-if=\"x.sentiment=='neutral'\">\n    <span style=\"color: rgb(226,100,0)\">\n    <i class=\"fa fa-asterisk\"></i>\n    </span>\n    </span>\n    <br><br>\n\n</p>\n</div>\n</body>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 780,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1e3f1902.76c0c7",
+        "type": "function",
+        "z": "b3b77d05.58b16",
+        "name": "chart_input",
+        "func": "msg.payload=[{\n    \"series\": [ \"News\" ],\n    \"data\": [ msg.payload[0], msg.payload[1], msg.payload[2] ],\n    \"labels\": [ \"Positive\", \"Negative\", \"Neutral\" ]\n}]\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 450,
+        "y": 360,
+        "wires": [
+            [
+                "1b9b7d7e.135093",
+                "91feb437.1e62a8",
+                "9d4a152e.015678",
+                "3386f732.908668"
+            ]
+        ]
+    },
+    {
+        "id": "1b9b7d7e.135093",
+        "type": "ui_chart",
+        "z": "b3b77d05.58b16",
+        "name": "bar_chart",
+        "group": "bb5fb9b9.a549f8",
+        "order": 1,
+        "width": 6,
+        "height": 5,
+        "label": "",
+        "chartType": "bar",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "600000",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#970000",
+            "#000000",
+            "#ce4300",
+            "#2ca02c",
+            "#98df8a",
+            "#971c1c",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 780,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "aad13b3.d1965c8",
+        "type": "function",
+        "z": "b3b77d05.58b16",
+        "name": "sentiment_fn",
+        "func": "var val=[msg.search_results.aggregations[0].results[0].matching_results];\nval.push(msg.search_results.aggregations[0].results[1].matching_results);\nval.push(msg.search_results.aggregations[0].results[2].matching_results);\nmsg.payload=val;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 510,
+        "y": 240,
+        "wires": [
+            [
+                "1e3f1902.76c0c7"
+            ]
+        ]
+    },
+    {
+        "id": "91feb437.1e62a8",
+        "type": "ui_chart",
+        "z": "b3b77d05.58b16",
+        "name": "pie_chart",
+        "group": "bb5fb9b9.a549f8",
+        "order": 2,
+        "width": 6,
+        "height": 5,
+        "label": "",
+        "chartType": "polar-area",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "600",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": "20",
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#970000",
+            "#000000",
+            "#ce4300",
+            "#2ca02c",
+            "#98df8a",
+            "#971c1c",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 780,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9d4a152e.015678",
+        "type": "ui_template",
+        "z": "b3b77d05.58b16",
+        "group": "9fb474e1.b18ca8",
+        "name": "sentiment_output",
+        "order": 1,
+        "width": "4",
+        "height": "2",
+        "format": "<style>body{position: relative;}</style>\n<body>\n<div>\n    <p ng-repeat=\"x in msg.payload\">\n        <span style= \"color: rgb(220,25,0)\">\n            <i class=\"fa fa-plus\"></i>\n           <strong> {{x['labels'][0]}} News:</strong> {{x['data'][0]}} \n        </span>\n            <br>\n         <span style= \"color: black\">\n             <i class=\"fa fa-minus\"></i>\n            <strong>{{x['labels'][1]}}\n            News:</strong>\n            {{x['data'][1]}}\n         </span>\n            <br>\n            <span style= \"color: rgb(226,100,0)\">\n                <i class=\"fa fa-asterisk\"></i>\n          <strong>  {{x['labels'][2]}}\n            News:</strong>\n            {{x['data'][2]}} \n        </span>\n    </p>\n</div>\n</body>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 750,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3386f732.908668",
+        "type": "ui_template",
+        "z": "b3b77d05.58b16",
+        "group": "9fb474e1.b18ca8",
+        "name": "Pic-Bar",
+        "order": 2,
+        "width": 4,
+        "height": 2,
+        "format": "<!DOCTYPE html>\n<html>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">\n<style>\nbody {margin:0;}\nbody {\n background-image:url(\"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgyw0dbERfsJDJRdMlAIa2WZiMeMiS4rnzoRUf36gNXIX1c0nj4Q&s\");\n background-repeat: no-repeat, repeat;\n  background-position: 0.5% 80.5%;\n  position: relative;\n}\n.icon-bar {\n  width: 100%;\n}\n\n.icon-bar a {\n  float: left;\n  width: 20%;\n  text-align: center;\n  padding: 0 0;\n  transition: all 0.3s ease;\n  color: white;\n  font-size: 20px;\n}\n\n.icon-bar a:hover {\n  background-color: white;\n}\n\n.active {\n  background-color: #4CAF50;\n}\n\n.footer {\n  left: 4%;\n  bottom: 3%;\n  position: fixed;\n  width: 10%;\n}\n\n</style>\n<body>\n<div class=\"icon-bar footer\">\n  <a href=\"tel:+91-7355679439\"><i class=\"fa fa-whatsapp\"></i></a>\n  <a href=\"mailto:ali.ifham@gmail.com\" target=\"_blank\"><i class=\"fa fa-envelope\"></i></a> \n  <a href=\"https://www.linkedin.com/in/ifham-ali\" target=\"_blank\"><i class=\"fa fa-linkedin\"></i></a> \n  <a href=\"https://github.com/IFHAM99\" target=\"_blank\"><i class=\"fa fa-github\"></i></a>\n  <a href=\"https://stackoverflow.com/users/13522671/ifham-ali\" target=\"_blank\"><i class=\"fa fa-stack-overflow\"></i></a> \n</div>\n</body>\n</html> \n\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 740,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "aaf12710.386aa8",
+        "type": "debug",
+        "z": "b3b77d05.58b16",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 690,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "f0a88ceb.00a94",
+        "type": "ui_group",
+        "z": "",
+        "name": "NEWS",
+        "tab": "979fca8a.5936f8",
+        "order": 2,
+        "disp": true,
+        "width": "14",
+        "collapse": false
+    },
+    {
+        "id": "bb5fb9b9.a549f8",
+        "type": "ui_group",
+        "z": "",
+        "name": "SENTIMENT VISUALIZATION",
+        "tab": "979fca8a.5936f8",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "9fb474e1.b18ca8",
+        "type": "ui_group",
+        "z": "",
+        "name": "",
+        "tab": "979fca8a.5936f8",
+        "order": 1,
+        "disp": true,
+        "width": 4,
+        "collapse": false
+    },
+    {
+        "id": "979fca8a.5936f8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "NEWS SEARCH",
+        "icon": "",
+        "disabled": false,
+        "hidden": false
+    }
+]
